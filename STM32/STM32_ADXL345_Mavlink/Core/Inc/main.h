@@ -57,6 +57,8 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define ADXL345_CS_Pin GPIO_PIN_1
+#define ADXL345_CS_GPIO_Port GPIOA
 
 /* USER CODE BEGIN Private defines */
 
