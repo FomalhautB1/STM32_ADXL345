@@ -1,0 +1,39 @@
+
+mavlink/mavlink/
+
+# STM32CubeIDE
+STM32/Debug/
+STM32/Release/
+STM32/build/
+STM32/*.cproject
+STM32/*.project
+STM32/.settings/
+STM32/.metadata/
+STM32/*.launch
+STM32/*.mxproject
+STM32/*.o
+STM32/*.d
+STM32/*.dep
+STM32/*.elf
+STM32/*.hex
+STM32/*.bin
+STM32/*.map
+STM32/*.dmp
+
+
+# Python virtual environment
+mavlink/mavlink-env/
+mavlink/__pycache__/
+mavlink/*.pyc
+
+# PC app build
+pc_app/build/
+pc_app/*.o
+
+# Backup/temp
+*.bak
+*.swp
+*.tmp
+*.orig
+*.mxproject
+*.log
