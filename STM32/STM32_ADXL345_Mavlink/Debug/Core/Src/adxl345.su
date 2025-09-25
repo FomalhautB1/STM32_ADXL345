@@ -1,3 +1,7 @@
-../Core/Src/adxl345.c:9:19:ADXL345_Init	24	static
-../Core/Src/adxl345.c:18:19:ADXL345_ReadAccel	56	static
-../Core/Src/adxl345.c:42:19:ADXL345_ReadDEVID	40	static
+../Core/Src/adxl345.c:18:19:ADXL345_WriteRegister	32	static
+../Core/Src/adxl345.c:24:19:ADXL345_ReadRegister	32	static
+../Core/Src/adxl345.c:29:19:ADXL345_WriteRegisters	64	dynamic
+../Core/Src/adxl345.c:39:19:ADXL345_ReadRegisters	32	static
+../Core/Src/adxl345.c:45:19:ADXL345_Init	16	static
+../Core/Src/adxl345.c:79:19:ADXL345_ReadAccel	48	static
+../Core/Src/adxl345.c:100:19:ADXL345_ReadDEVID	16	static

@@ -103,7 +103,7 @@ int main(void)
   uint8_t buf[MAVLINK_MAX_PACKET_LEN];
   mavlink_message_t msg;
 
-  float ax, ay, az; //переменные для хранения значений с аккселерометра
+  //float ax, ay, az; //переменные для хранения значений с аккселерометра
 
   //uint8_t devid = ADXL345_ReadDEVID();
   uint8_t devid = 0;
@@ -116,6 +116,28 @@ int main(void)
   uint32_t last_time = 0; // переменная для работы счетчика
   const uint32_t interval_ms = 20; // 50 Гц - частота обновления данных аккселерометра
 
+  void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+  {
+      if (GPIO_Pin == GPIO_PIN_8)  // проверяем, что это именно PA8
+      {
+          float ax, ay, az;
+          ADXL345_ReadAccel(&ax, &ay, &az);
+          uint64_t time_usec = HAL_GetTick();
+          mavlink_msg_ins_accel_pack(
+          	            1,      // system_id
+          	            200,    // component_id
+          	            &msg,
+          	            time_usec,
+          	            ax + ACC_X_OFFSET,
+          	            ay + ACC_Y_OFFSET,
+          	            az + ACC_Z_OFFSET
+          	        ); //формируем пакет
+
+          	        uint16_t len = mavlink_msg_to_send_buffer(buf, &msg);
+          	        HAL_UART_Transmit(&huart2, buf, len, HAL_MAX_DELAY);
+      }
+  }
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -125,7 +147,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-
+/*
 	    uint32_t now = HAL_GetTick();
 	    if ((now - last_time) >= interval_ms)
 	    {
@@ -148,14 +170,16 @@ int main(void)
 
 	        uint16_t len = mavlink_msg_to_send_buffer(buf, &msg);
 	        HAL_UART_Transmit(&huart2, buf, len, HAL_MAX_DELAY);
+*/
 
-
-	        /*
+/*
 	        char buf[64];
 	        sprintf(buf, "%.3f %.3f %.3f\n", ax, ay, az);
 	        HAL_UART_Transmit(&huart2, (uint8_t*)buf, strlen(buf), HAL_MAX_DELAY);
-	        */
-	    }
+*/
+
+
+
   }
   /* USER CODE END 3 */
 }
@@ -293,6 +317,16 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PA8 */
+  GPIO_InitStruct.Pin = GPIO_PIN_8;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
 
   /* USER CODE BEGIN MX_GPIO_Init_2 */
 

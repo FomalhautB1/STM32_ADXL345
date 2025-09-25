@@ -10,6 +10,17 @@
 
 #include "stm32f4xx_hal.h"
 
+HAL_StatusTypeDef ADXL345_WriteRegister(uint8_t reg, uint8_t value);
+
+// Чтение одного байта из регистра
+HAL_StatusTypeDef ADXL345_ReadRegister(uint8_t reg, uint8_t *value);
+
+// Запись нескольких байт подряд в регистр (например, в FIFO или DATA_FORMAT)
+HAL_StatusTypeDef ADXL345_WriteRegisters(uint8_t reg, uint8_t *values, uint8_t length);
+
+// Чтение нескольких байт подряд из регистра
+HAL_StatusTypeDef ADXL345_ReadRegisters(uint8_t reg, uint8_t *buffer, uint8_t length);
+
 // Инициализация ADXL345 (Measure mode)
 HAL_StatusTypeDef ADXL345_Init(void);
 
