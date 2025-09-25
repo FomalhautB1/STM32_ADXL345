@@ -33,7 +33,9 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#define ACC_X_OFFSET -1.29
+#define ACC_Y_OFFSET -2.8
+#define ACC_Z_OFFSET 0
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -101,6 +103,7 @@ int main(void)
   uint8_t buf[MAVLINK_MAX_PACKET_LEN];
   mavlink_message_t msg;
 
+  float ax, ay, az; //переменные для хранения значений с аккселерометра
 
   //uint8_t devid = ADXL345_ReadDEVID();
   uint8_t devid = 0;
@@ -110,11 +113,9 @@ int main(void)
       printf("Ошибка чтения DEVID\n");
   }
 
-  char msssg[50];
-  int len = snprintf(msssg, sizeof(msssg), "ADXL345 DEVID: 0x%X\r\n", devid);
-  HAL_UART_Transmit(&huart2, (uint8_t*)msssg, len, HAL_MAX_DELAY);
+  uint32_t last_time = 0; // переменная для работы счетчика
+  const uint32_t interval_ms = 20; // 50 Гц - частота обновления данных аккселерометра
 
-  //uint8_t test_msg[] = "Hello UART!\r\n";
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -124,31 +125,37 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  {
-	          float ax, ay, az;
 
-	          uint64_t time_usec = HAL_GetTick() * 1000; // миллисекунды → мкс
+	    uint32_t now = HAL_GetTick();
+	    if ((now - last_time) >= interval_ms)
+	    {
+	        last_time = now;
 
-	          ADXL345_ReadAccel(&ax, &ay, &az);
+	        float ax, ay, az;
+	        uint64_t time_usec = now;
 
-	          mavlink_msg_ins_accel_pack(
-	              1,      // system_id
-	              200,    // component_id
-	              &msg,
-	              time_usec,
-	              ax, ay, az
-	          );
+	        ADXL345_ReadAccel(&ax, &ay, &az); // читаем данные с аккселерометра
 
-	          uint16_t len = mavlink_msg_to_send_buffer(buf, &msg);
-	          HAL_UART_Transmit(&huart2, buf, len, HAL_MAX_DELAY);
-/*
-	          char buf[64];
-	          sprintf(buf, "%.3f %.3f %.3f\n", ax, ay, az);
-	          HAL_UART_Transmit(&huart2, (uint8_t*)buf, strlen(buf), HAL_MAX_DELAY);
-*/
+	        mavlink_msg_ins_accel_pack(
+	            1,      // system_id
+	            200,    // component_id
+	            &msg,
+	            time_usec,
+	            ax + ACC_X_OFFSET,
+	            ay + ACC_Y_OFFSET,
+	            az + ACC_Z_OFFSET
+	        ); //формируем пакет
 
-	          HAL_Delay(20); // 50 Гц
-	      }
+	        uint16_t len = mavlink_msg_to_send_buffer(buf, &msg);
+	        HAL_UART_Transmit(&huart2, buf, len, HAL_MAX_DELAY);
+
+
+	        /*
+	        char buf[64];
+	        sprintf(buf, "%.3f %.3f %.3f\n", ax, ay, az);
+	        HAL_UART_Transmit(&huart2, (uint8_t*)buf, strlen(buf), HAL_MAX_DELAY);
+	        */
+	    }
   }
   /* USER CODE END 3 */
 }

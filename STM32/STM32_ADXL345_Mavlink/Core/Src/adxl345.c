@@ -40,6 +40,6 @@ HAL_StatusTypeDef ADXL345_ReadAccel(float *x, float *y, float *z) {
 
 // Чтение ID чипа
 HAL_StatusTypeDef ADXL345_ReadDEVID(uint8_t *devid) {
-    uint8_t reg = 0x00; // DEVID register
+    uint8_t reg = 0x53; // DEVID register
     return HAL_I2C_Mem_Read(&hi2c1, ADXL345_I2C_ADDR, reg, I2C_MEMADD_SIZE_8BIT, devid, 1, HAL_MAX_DELAY);
 }
