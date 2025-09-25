@@ -3,6 +3,10 @@ mavlink/mavlink/
 mavlink/
 !mavlink/message_definitions/v1.0/adxl345.xml
 !mavlink/generated/
+PC\ App/pc_app
+.vscode/
+
+
 
 # STM32CubeIDE
 STM32/Debug/
@@ -22,7 +26,7 @@ STM32/*.hex
 STM32/*.bin
 STM32/*.map
 STM32/*.dmp
-
+STM32/STM32_ADXL345_Mavlink/Debug/
 
 # Python virtual environment
 mavlink/mavlink-env/

@@ -124,7 +124,6 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-
 	  {
 	          float ax, ay, az;
 
@@ -141,11 +140,12 @@ int main(void)
 	          );
 
 	          uint16_t len = mavlink_msg_to_send_buffer(buf, &msg);
-	          //HAL_UART_Transmit(&huart2, buf, len, HAL_MAX_DELAY);
-
+	          HAL_UART_Transmit(&huart2, buf, len, HAL_MAX_DELAY);
+/*
 	          char buf[64];
 	          sprintf(buf, "%.3f %.3f %.3f\n", ax, ay, az);
 	          HAL_UART_Transmit(&huart2, (uint8_t*)buf, strlen(buf), HAL_MAX_DELAY);
+*/
 
 	          HAL_Delay(20); // 50 Гц
 	      }
