@@ -1,0 +1,3 @@
+../Core/Src/adxl345.c:9:19:ADXL345_Init	1
+../Core/Src/adxl345.c:18:19:ADXL345_ReadAccel	3
+../Core/Src/adxl345.c:42:19:ADXL345_ReadDEVID	1

@@ -8,18 +8,17 @@
 #ifndef INC_ADXL345_H_
 #define INC_ADXL345_H_
 
-#ifndef ADXL345_H
-#define ADXL345_H
-
 #include "stm32f4xx_hal.h"
 
-#define ADXL345_SPI &hspi1
-#define ADXL345_CS_PIN ADXL345_CS_Pin
-#define ADXL345_CS_PORT GPIOA
+// Инициализация ADXL345 (Measure mode)
+HAL_StatusTypeDef ADXL345_Init(void);
 
-void ADXL345_Init(void);
-void ADXL345_ReadAccel(float *x, float *y, float *z);
+// Чтение ускорений по осям X, Y, Z (в м/с²)
+HAL_StatusTypeDef ADXL345_ReadAccel(float *x, float *y, float *z);
 
-#endif
+// Чтение ID чипа (ожидаемый 0xE5)
+HAL_StatusTypeDef ADXL345_ReadDEVID(uint8_t *devid);
 
 #endif /* INC_ADXL345_H_ */
+
+

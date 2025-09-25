@@ -1,42 +1,45 @@
-/*
- * adxl345.c
- *
- *  Created on: Sep 24, 2025
- *      Author: bdfy
- */
-
-
 #include "adxl345.h"
+#include "stm32f4xx_hal.h"
 
-extern SPI_HandleTypeDef hspi1;
+extern I2C_HandleTypeDef hi2c1;
 
-static void ADXL345_CS(uint8_t state) {
-    HAL_GPIO_WritePin(ADXL345_CS_PORT, ADXL345_CS_PIN, state ? GPIO_PIN_SET : GPIO_PIN_RESET);
+#define ADXL345_I2C_ADDR  (0x53 << 1)  // HAL использует 8-битный адрес (<<1)
+
+// Инициализация ADXL345 (режим измерения)
+HAL_StatusTypeDef ADXL345_Init(void) {
+    uint8_t data[2];
+
+    data[0] = 0x2D;   // POWER_CTL register
+    data[1] = 0x08;   // Measure mode
+    return HAL_I2C_Master_Transmit(&hi2c1, ADXL345_I2C_ADDR, data, 2, HAL_MAX_DELAY);
 }
 
-void ADXL345_Init(void) {
-    uint8_t data = 0x08; // Measure mode
-    ADXL345_CS(0);
-    uint8_t addr = 0x2D; // POWER_CTL
-    HAL_SPI_Transmit(ADXL345_SPI, &addr, 1, 100);
-    HAL_SPI_Transmit(ADXL345_SPI, &data, 1, 100);
-    ADXL345_CS(1);
-}
+// Чтение акселерометра X, Y, Z
+HAL_StatusTypeDef ADXL345_ReadAccel(float *x, float *y, float *z) {
+    uint8_t reg = 0x32; // DATA_X0 register
+    uint8_t rx[6] = {0};
 
-void ADXL345_ReadAccel(float *x, float *y, float *z) {
-    uint8_t rx[6], tx[6];
-    uint8_t addr = 0x32 | 0x80; // DATA_X0 register + read bit
-    ADXL345_CS(0);
-    HAL_SPI_Transmit(ADXL345_SPI, &addr, 1, 100);
-    HAL_SPI_Receive(ADXL345_SPI, rx, 6, 100);
-    ADXL345_CS(1);
+    // Чтение 6 байт подряд: X0,X1,Y0,Y1,Z0,Z1
+    HAL_StatusTypeDef ret = HAL_I2C_Master_Transmit(&hi2c1, ADXL345_I2C_ADDR, &reg, 1, HAL_MAX_DELAY);
+    if(ret != HAL_OK) return ret;
 
-    int16_t raw_x = (rx[1]<<8) | rx[0];
-    int16_t raw_y = (rx[3]<<8) | rx[2];
-    int16_t raw_z = (rx[5]<<8) | rx[4];
+    ret = HAL_I2C_Master_Receive(&hi2c1, ADXL345_I2C_ADDR, rx, 6, HAL_MAX_DELAY);
+    if(ret != HAL_OK) return ret;
 
-    float scale = 0.0039f*9.81f; // для ±2g
+    int16_t raw_x = (rx[1] << 8) | rx[0];
+    int16_t raw_y = (rx[3] << 8) | rx[2];
+    int16_t raw_z = (rx[5] << 8) | rx[4];
+
+    float scale = 0.0039f * 9.81f; // ±2g
     *x = raw_x * scale;
     *y = raw_y * scale;
     *z = raw_z * scale;
+
+    return HAL_OK;
+}
+
+// Чтение ID чипа
+HAL_StatusTypeDef ADXL345_ReadDEVID(uint8_t *devid) {
+    uint8_t reg = 0x00; // DEVID register
+    return HAL_I2C_Mem_Read(&hi2c1, ADXL345_I2C_ADDR, reg, I2C_MEMADD_SIZE_8BIT, devid, 1, HAL_MAX_DELAY);
 }

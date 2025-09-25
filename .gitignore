@@ -1,5 +1,8 @@
 
 mavlink/mavlink/
+mavlink/
+!mavlink/message_definitions/v1.0/adxl345.xml
+!mavlink/generated/
 
 # STM32CubeIDE
 STM32/Debug/
